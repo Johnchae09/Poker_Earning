@@ -1,0 +1,34 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+#Changing string date format into integer
+df = pd.read_csv("Data/Daniel Negreanu.csv",na_values=["null"],index_col="Date",parse_dates=True,infer_datetime_format=True) ##Change csv file for different players
+df = df.dropna()
+
+#Sort data frame by descending date
+df_descending = df.sort_values(by = "Date", ascending = True)
+
+#Clean data
+df_descending["int earning"] = df_descending["Earning"].str.replace(r'[^0-9]', '', regex=True)
+df_descending["int earning"] = df_descending["int earning"].astype(int)
+
+df_descending["Ranking"] = df_descending["Placement"].str.replace(r'[^0-9]', '', regex=True)
+df_descending["Ranking"] = df_descending["Ranking"].astype(int)
+
+
+df_descending["Buy-in"] = df_descending["Event Name"].str[:15].str.replace(r'\s*\+.*', '').str.replace(r'\s*\#.*', '')
+df_descending["Buy-in"] = df_descending["Buy-in"].str.replace(r'[^0-9]', '', regex=True)
+df_descending["Buy-in"] = pd.to_numeric(df_descending["Buy-in"])
+
+#cumulative earnings
+df_descending["Earning increment"] = df_descending["int earning"].cumsum()
+
+#plotting
+plt.figure(figsize=(12, 6))
+plt.ylabel("Dollar")
+df_descending["Earning increment"].plot()
+plt.figure()
+df_descending["Buy-in"].plot()
+
+df_descending.to_csv("Cleaned/Daniel Negreanu Cleaned.csv")
