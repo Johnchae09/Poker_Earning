@@ -1,0 +1,70 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import os
+
+def ScrapeURL(url):
+    data = requests.get(url)
+    
+    soup = BeautifulSoup(data.text,'lxml')
+    page_title = soup.title.get_text()
+    
+    # Extract the player name from the page title
+    player_name = page_title.split(" | ")[0]
+    player_name = player_name.split(':', 1)[0]
+
+    columns1 = soup.findAll("tr", attrs = {"class": "row0"})
+    columns2 = soup.findAll("tr", attrs = {"class": "row1"})
+    
+    # Create a new BeautifulSoup object to hold the combined data
+    combined_colums = BeautifulSoup(features="html.parser")
+    
+    # Append each element from columns1 to the new combined_soup object
+    for item in columns1:
+        combined_colums.append(item)
+    
+    # Append each element from columns2 to the new combined_soup object
+    for item in columns2:
+        combined_colums.append(item)
+    
+    event_names = []
+    dates = []
+    earnings = []
+    placement = []
+    # Loop through each element in combined_colums
+    for item in combined_colums:
+        # Find the elements within each row that contain the desired information
+        event_name = item.find("td", attrs={"class": "event_name"})
+        date = item.find("td", attrs={"class": "date"})
+        earning = item.findAll("td", attrs={"class": "currency"})
+        place = item.find("td", attrs = {"class": "place"})
+        
+        # Extract the text from the found elements, if they exist
+        if event_name:
+            event_names.append(event_name.get_text().strip())
+        else:
+            event_names.append("")
+        if date:
+            dates.append(date.get_text().strip())
+        else:
+            dates.append("")
+        if earning:
+            # Append the second currency element's text if it exists
+            valid_earnings = [e.get_text().strip() for e in earning if "$" in e.get_text()]
+            earnings.extend(valid_earnings)
+        else:
+            # Append an empty string if there is no second currency element
+            earnings.append("")
+        if place:
+            placement.append(place.get_text().strip())
+        else:
+            placement.append("")
+    
+    #Creating the data frame with the acquired data
+    list_tuple = list(zip(dates, event_names, placement, earnings))
+    df = pd.DataFrame(list_tuple, columns = ["Date","Event Name", "Placement","Earning"])
+    
+    csv_filename = f"{player_name}.csv"
+    
+    csv_path = os.path.join(os.getcwd(), "Data/" + csv_filename)
+    df.to_csv(csv_path, index=False, encoding='utf-8')
