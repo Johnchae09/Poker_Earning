@@ -1,0 +1,35 @@
+from HendonMob_Scrape import *
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import os
+
+#The url have links to each individual players all time money list
+#Scrape the links
+url = "https://pokerdb.thehendonmob.com/ranking/all-time-money-list/" 
+
+data = requests.get(url)
+
+soup = BeautifulSoup(data.text, "lxml")
+
+urls = soup.findAll('td', attrs = {"class": "name"})
+
+extended_urls = []
+for url in urls:
+    extended_url = url.find_all('a')  # Use find_all on individual element
+
+    links = [l.get("href") for l in extended_url if l.get("href") is not None]
+    
+    extended_urls.extend(links)
+    
+
+players_url = []
+site = "https://pokerdb.thehendonmob.com/"
+
+
+for i in range(len(extended_urls)):
+    players_url.append(site + extended_urls[i])
+    
+for i in range(len(players_url)):
+    
+    ScrapeURL(players_url[i])
