@@ -58,8 +58,8 @@ The LSTM neural network architecture is defined using the Keras library. Two LST
 
 ## More
 
-Interesting player, Espen Uhlen Jørstad 2022 Main Event Champion winning 10,000,000 USD. Before the main event win, Espen was playing in low stakes and didn't have a notable win yet. Interesting to see how the model predicted his earnings.
+Interesting player, Espen Uhlen Jørstad 2022 Main Event Champion winning 10,000,000 USD. Before the main event win, Espen was playing in low stakes and didn't have a notable win yet. Interesting to see how the model predicted his earnings. I've set the model to predict right before his Main Event Win of 10 Million dollars.
 
 ![CHEESE!](https://github.com/Johnchae09/Poker_Earning/blob/main/images/jorstad_model.png?raw=true)
 
-I've set the model to predict right before his Main Event Win of 10 Million dollars.
+
